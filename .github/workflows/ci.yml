@@ -99,8 +99,8 @@ jobs:
       - name: Validate Expo Configuration
         run: npx expo config --type public
 
-      - name: Bundle Dry-Run (Web Export)
-        run: npx expo export --platform web --output-dir dist-dry-run
+      - name: Bundle Dry-Run (Mobile Export)
+        run: npx expo export --platform android --output-dir dist-dry-run
 
   # ============================================================================
   # 4. BACKEND SERVER (Fastify + Postgres API) QUALITY GATE
