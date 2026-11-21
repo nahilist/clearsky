@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Linking, Text, View } from 'react-native';
+import { ObserveInteractiveMarker } from 'expo-observe';
 import { WeatherGlyph } from '../../components/Icon';
 import { AlertBanner, Body, Button, Card, Label, Notice, Screen, Skeleton } from '../../components/ui';
 import { clock, hourLabel, useFmt, weekday } from '../../lib/format';
@@ -64,6 +65,7 @@ export default function Today() {
 
   return (
     <Screen refreshing={isFetching && !isLoading} onRefresh={() => void refetch()}>
+      <ObserveInteractiveMarker params={{ hasForecast: true }} />
       <View style={{ paddingHorizontal: 4, gap: 2 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={{ fontFamily: font.semibold, fontSize: 15, color: T.muted }}>{place.name}{place.sub ? `, ${place.sub.split(',')[0]}` : ''}</Text>
