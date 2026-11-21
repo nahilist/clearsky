@@ -1,0 +1,33 @@
+# Production-shaped stack: Postgres, two stateless API replicas, nginx load balancer.
+#   docker compose up -d --build         (scale further: docker compose up -d --scale api=4)
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: clearsky
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: clearsky
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U clearsky"], interval: 5s, timeout: 3s, retries: 20 }
+  api:
+    build: { context: ., dockerfile: server/Dockerfile }
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    deploy: { replicas: 2 }
+    environment:
+      DATABASE_URL: postgres://clearsky:${POSTGRES_PASSWORD}@db:5432/clearsky
+      PG_POOL_MAX: "10"
+      OPEN_METEO_API_KEY: ${OPEN_METEO_API_KEY:-}
+      OPEN_METEO_BASE: ${OPEN_METEO_BASE:-https://api.open-meteo.com}
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}
+      METRICS_TOKEN: ${METRICS_TOKEN:?set METRICS_TOKEN}
+    healthcheck: { test: ["CMD", "node", "-e", "fetch('http://localhost:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 15s, timeout: 3s, retries: 3 }
+  lb:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on: [api]
+    ports: ["8080:80"]
+    volumes: ["./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
+volumes:
+  pgdata:
