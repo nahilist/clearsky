@@ -1,6 +1,7 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, useFonts } from '@expo-google-fonts/inter';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
+import { Observe, ObserveRoot, useObserve } from 'expo-observe';
 import { Stack, SplashScreen, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -16,6 +17,17 @@ import { useStore } from '../store';
 import { T, isIOS } from '../theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
+
+try {
+  Observe.configure({
+    dispatchInDebug: true,
+    integrations: {
+      'expo-router': true,
+    },
+  });
+} catch {
+  // Gracefully ignored in unsupported environments (e.g. Expo Go)
+}
 
 if (process.env.EXPO_PUBLIC_SENTRY_DSN) {
   Sentry.init({
@@ -47,14 +59,22 @@ function Boot() {
 }
 
 function Root() {
+  const { markInteractive } = useObserve();
   const hydrated = useStore((s) => s.hydrated);
   const onboarded = useStore((s) => s.onboarded);
   const [fontsLoaded] = useFonts({ Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold });
   const ready = hydrated && fontsLoaded;
 
   useEffect(() => {
-    if (ready) void SplashScreen.hideAsync();
-  }, [ready]);
+    if (ready) {
+      void SplashScreen.hideAsync();
+      try {
+        markInteractive();
+      } catch {
+        // Ignored in unsupported environments
+      }
+    }
+  }, [ready, markInteractive]);
 
   if (!ready) return null;
   return (
@@ -97,13 +117,15 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 
 function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <Root />
-        </QueryClientProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ObserveRoot>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <QueryClientProvider client={queryClient}>
+            <Root />
+          </QueryClientProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ObserveRoot>
   );
 }
 
