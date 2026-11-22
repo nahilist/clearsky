@@ -6,7 +6,18 @@ iOS ships the dark glass look, Android ships Material 3 (chosen at runtime in `a
 ```
 app/      Expo SDK 58, expo-router, TypeScript
 server/   Fastify + Postgres API (forecast cache, geocoding proxy, push alerts)
+supabase/ PostgreSQL schema, triggers & Row Level Security (RLS)
 ```
+
+## Engineering & Product Documentation
+
+Comprehensive MVP and production architecture documentation is available in the [`docs/`](./docs) directory:
+* 📄 **[Product Requirements Document (PRD)](./docs/PRD.md)** — Vision, user personas, MVP vs. Production scope, functional specifications, and KPI metrics.
+* 🏛️ **[System Architecture](./docs/ARCHITECTURE.md)** — Monorepo structure, system topology, weather request sequence, Supabase sync, and advisory lock worker.
+* 🛡️ **[Security Architecture](./docs/SECURITY.md)** — STRIDE threat model, Row Level Security (RLS), JWT validation, CGNAT rate limiting, and spatial grid quantization.
+* 🗄️ **[Database Schema](./docs/DATABASE_SCHEMA.md)** — Full ERD diagrams, Supabase auth tables, Fastify push worker tables, and data pruning lifecycle.
+* 🚀 **[Deployment & DevOps Runbook](./docs/DEPLOYMENT_DEVOPS.md)** — EAS Build mobile guide, multi-stage Dockerfile, Docker Compose stack, CI/CD pipeline, and incident response.
+
 
 ## What is built
 
