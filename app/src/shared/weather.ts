@@ -23,7 +23,6 @@ export function openMeteoQuery(lat: number, lon: number): string {
 type Arr = (number | null)[];
 const n = (v: number | null | undefined, d = 0): number => (typeof v === 'number' && Number.isFinite(v) ? v : d);
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function normalizeOpenMeteo(raw: any, lat: number, lon: number): Forecast {
   const c = raw.current;
   const h = raw.hourly;

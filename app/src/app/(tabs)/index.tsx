@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Linking, Text, View } from 'react-native';
-import { ObserveInteractiveMarker } from 'expo-observe';
+import { ObserveInteractiveMarker } from '../../lib/observe';
 import { WeatherGlyph } from '../../components/Icon';
 import { AlertBanner, Body, Button, Card, Label, Notice, Screen, Skeleton } from '../../components/ui';
 import { clock, hourLabel, useFmt, weekday } from '../../lib/format';
-import { useForecast } from '../../lib/hooks';
+import { useAir, useForecast } from '../../lib/hooks';
 import { useDeviceLocation } from '../../lib/location';
 import { AdviceCard, AirCard, RainNow, SunMoonCard } from '../../components/cards';
 import { allAlerts } from '../../lib/alertsFor';
-import { useAir } from '../../lib/hooks';
 import { useT } from '../../i18n';
 import { dailyAdvice } from '../../shared/advice';
 import { describeCode } from '../../shared/weather';
@@ -23,9 +23,15 @@ export default function Today() {
   const isPro = useStore((s) => s.isPro);
   const prefs = useStore((s) => s.prefs);
   const aq = useAir(place);
-  const { forecast: f, isLoading, isError, isFetching, isCached, refetch } = useForecast(place);
+  const { forecast: f, isLoading, isError, error, isFetching, isCached, refetch } = useForecast(place);
   const { status, locate } = useDeviceLocation();
-  const muted = useStore((s) => s.mutedUntil) > Date.now();
+  const mutedUntil = useStore((s) => s.mutedUntil);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const muted = mutedUntil > now;
 
   if (!place) {
     return (
@@ -48,7 +54,12 @@ export default function Today() {
         <Skeleton h={120} w="60%" />
         <Skeleton h={150} />
         <Skeleton h={90} />
-        {isError && !isLoading && <Notice tone="error">Can't load the forecast. Pull down to try again.</Notice>}
+        {isError && !isLoading && (
+          <Notice tone="error">
+            Can&apos;t load the forecast. Pull down to try again.
+            {__DEV__ && error ? `\n(${error instanceof Error ? error.message : String(error)})` : ''}
+          </Notice>
+        )}
       </Screen>
     );
   }
@@ -61,7 +72,7 @@ export default function Today() {
   const tips = dailyAdvice(f, aq, lang);
   const severe = top.find((a) => a.severity !== 'info');
   const rain = top.find((a) => a.kind === 'rain_soon');
-  const ageMin = Math.round((Date.now() - f.fetchedAt) / 60000);
+  const ageMin = Math.round((now - f.fetchedAt) / 60000);
 
   return (
     <Screen refreshing={isFetching && !isLoading} onRefresh={() => void refetch()}>

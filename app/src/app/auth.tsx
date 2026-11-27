@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, Card, Notice, Screen, Title } from '../components/ui';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { fetchUserPlaces, fetchUserRules, updateUserProfile } from '../lib/supabaseSync';

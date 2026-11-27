@@ -79,26 +79,29 @@ export function RainNow({ f }: { f: Forecast }) {
   );
 }
 
-export function SunMoonCard({ day }: { day: Day }) {
-  const t = useT();
-  const lang = useStore((s) => s.lang);
-  const sun = sunTimes(day.sunrise, day.sunset);
-  const moon = moonPhase(day.date, lang);
-  const Row = ({ k, v }: { k: string; v: string }) => (
+function SunMoonRow({ k, v }: { k: string; v: string }) {
+  return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
       <Text style={{ fontFamily: font.regular, fontSize: 14, color: T.muted }}>{k}</Text>
       <Text style={{ fontFamily: font.semibold, fontSize: 14, color: T.text, flexShrink: 1, textAlign: 'right' }}>{v}</Text>
     </View>
   );
+}
+
+export function SunMoonCard({ day }: { day: Day }) {
+  const t = useT();
+  const lang = useStore((s) => s.lang);
+  const sun = sunTimes(day.sunrise, day.sunset);
+  const moon = moonPhase(day.date, lang);
   return (
     <Card>
       <Label>{t('sun.title')}</Label>
-      <Row k={t('sun.rise')} v={clock(day.sunrise)} />
-      <Row k={t('sun.set')} v={clock(day.sunset)} />
-      <Row k={t('sun.daylight')} v={sun.daylight} />
-      <Row k={`${t('sun.golden')} (AM)`} v={sun.morningGolden} />
-      <Row k={`${t('sun.golden')} (PM)`} v={sun.eveningGolden} />
-      <Row k={t('sun.moon')} v={`${moon.name} · ${t('sun.lit', { n: Math.round(moon.illumination * 100) })}`} />
+      <SunMoonRow k={t('sun.rise')} v={clock(day.sunrise)} />
+      <SunMoonRow k={t('sun.set')} v={clock(day.sunset)} />
+      <SunMoonRow k={t('sun.daylight')} v={sun.daylight} />
+      <SunMoonRow k={`${t('sun.golden')} (AM)`} v={sun.morningGolden} />
+      <SunMoonRow k={`${t('sun.golden')} (PM)`} v={sun.eveningGolden} />
+      <SunMoonRow k={t('sun.moon')} v={`${moon.name} · ${t('sun.lit', { n: Math.round(moon.illumination * 100) })}`} />
     </Card>
   );
 }

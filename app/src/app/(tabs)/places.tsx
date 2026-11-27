@@ -26,14 +26,19 @@ export default function Places() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (q.trim().length < 2) {
+  const onQueryChange = (text: string) => {
+    setQ(text);
+    if (text.trim().length < 2) {
       setResults([]);
       setErr(null);
-      return;
+      setBusy(false);
     }
-    setBusy(true);
+  };
+
+  useEffect(() => {
+    if (q.trim().length < 2) return;
     const t = setTimeout(() => {
+      setBusy(true);
       geocode(q)
         .then((r) => { setResults(r); setErr(null); })
         .catch(() => setErr('Search failed. Check your connection.'))
@@ -74,7 +79,7 @@ export default function Places() {
         <TextInput
           accessibilityLabel="Search city or pin code"
           value={q}
-          onChangeText={setQ}
+          onChangeText={onQueryChange}
           placeholder="Search city or pin code"
           placeholderTextColor={T.muted}
           autoCorrect={false}

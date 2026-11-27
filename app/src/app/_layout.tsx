@@ -1,7 +1,7 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, useFonts } from '@expo-google-fonts/inter';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
-import { Observe, ObserveRoot, useObserve } from 'expo-observe';
+import { Observe, ObserveRoot, useObserve } from '../lib/observe';
 import { Stack, SplashScreen, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';

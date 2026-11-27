@@ -21,16 +21,19 @@ export async function setupChannels() {
   try {
     await Notifications.setNotificationChannelAsync('severe', {
       name: 'Severe weather',
+      // eslint-disable-next-line import/namespace
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#F5B83D',
     });
     await Notifications.setNotificationChannelAsync('rain', {
       name: 'Rain starting soon',
+      // eslint-disable-next-line import/namespace
       importance: Notifications.AndroidImportance.DEFAULT,
     });
     await Notifications.setNotificationChannelAsync('daily', {
       name: 'Daily briefing',
+      // eslint-disable-next-line import/namespace
       importance: Notifications.AndroidImportance.LOW,
     });
   } catch {

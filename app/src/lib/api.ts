@@ -11,6 +11,9 @@ async function getJson<T>(url: string, init?: RequestInit, timeoutMs = 12000): P
     const res = await fetch(url, { ...init, signal: ctl.signal, headers: { Accept: 'application/json', ...init?.headers } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return (await res.json()) as T;
+  } catch (err) {
+    if (__DEV__) console.warn('[API error]', url, err);
+    throw err;
   } finally {
     clearTimeout(timer);
   }

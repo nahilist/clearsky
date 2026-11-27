@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { AlertBanner, Body, Card, Label, Notice, Screen, Skeleton, Title } from '../../components/ui';
 import { useAlerts, useAllPlaces } from '../../lib/hooks';
@@ -13,7 +14,13 @@ export default function Alerts() {
   const places = useAllPlaces();
   const { items, loading } = useAlerts(places);
   const severe = useStore((s) => s.prefs.severe);
-  const muted = useStore((s) => s.mutedUntil) > Date.now();
+  const mutedUntil = useStore((s) => s.mutedUntil);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const muted = mutedUntil > now;
 
   return (
     <Screen>
